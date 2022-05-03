@@ -32,7 +32,7 @@ def list_build_pipelines():
           "url": pipeline["url"],
         })
 
-      print("Pipelines total: " + str(count))
+      print("Build pipelines total: " + str(count))
       return results
   except ValueError as err:
     print("Error: {}".format(err))
@@ -67,7 +67,7 @@ def list_release_pipelines():
           "url": pipeline["url"],
         })
 
-      print("Pipelines total: " + str(count))
+      print("Relase pipelines total: " + str(count))
       return results
   except ValueError as err:
     print("Error: {}".format(err))
@@ -83,7 +83,7 @@ def get_build_pipeline_metadata(id: str):
   Args:
     id(str): pipeline id
   """
-  cmd = 'az pipelines show --organization ' +  "https://dev.azure.com/" + constants.ORG_NAME + ' --project ' + '"{}"'.format(constants.PROJECT_NAME) + ' --id ' + id
+  cmd = 'az pipelines show --organization ' +  "https://dev.azure.com/" + constants.ORG_NAME + ' --project ' + '"{}"'.format(constants.PROJECT_NAME) + ' --id ' + '"{}"'.format(id)
 
   try:
     p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
@@ -94,7 +94,13 @@ def get_build_pipeline_metadata(id: str):
       pipeline = json.loads(out.decode("utf-8"))
 
       # Filter info as needed
-      return pipeline
+      return {
+        "id": pipeline["id"],
+        "name": pipeline["name"],
+        "path": pipeline["path"],
+        "phases": pipeline["process"]["phases"] if ("phases" in pipeline["process"]) else [],  
+        "variableGroups": pipeline["variableGroups"],
+      }
   except ValueError as err:
     print("Error: {}".format(err))
     sys.exit()
@@ -104,12 +110,12 @@ def get_release_pipeline_metadata(id: str):
   """
   Get release pipeline metadata
 
-  az command example: az pipelines show --organization https://dev.azure.com/<org name> --project <project name> --id <pipeline id>
+  az command example: az pipelines release definition show --organization https://dev.azure.com/<org name> --project <project name> --id <pipeline id>
 
   Args:
     id(str): pipeline id
   """
-  cmd = 'az pipelines release definition show --organization ' +  "https://dev.azure.com/" + constants.ORG_NAME + ' --project ' + '"{}"'.format(constants.PROJECT_NAME) + ' --id ' + id
+  cmd = 'az pipelines release definition show --organization ' +  "https://dev.azure.com/" + constants.ORG_NAME + ' --project ' + '"{}"'.format(constants.PROJECT_NAME) + ' --id ' + '"{}"'.format(id)
 
   try:
     p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
@@ -120,7 +126,12 @@ def get_release_pipeline_metadata(id: str):
       pipeline = json.loads(out.decode("utf-8"))
 
       # Filter info as needed
-      return pipeline
+      return {
+        "environments": pipeline["environments"],
+        "id": pipeline["id"],
+        "name": pipeline["name"],
+        "path": pipeline["path"],
+      }
   except ValueError as err:
     print("Error: {}".format(err))
     sys.exit()
