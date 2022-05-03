@@ -104,7 +104,7 @@ def get_release_pipeline_metadata(id: str):
   """
   Get release pipeline metadata
 
-  az command example: az pipelines show --organization https://dev.azure.com/<org name> --project <project name> --pipeline-id <pipeline id>
+  az command example: az pipelines show --organization https://dev.azure.com/<org name> --project <project name> --id <pipeline id>
 
   Args:
     id(str): pipeline id
